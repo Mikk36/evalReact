@@ -1,0 +1,9 @@
+@import 'styles/theme';
+
+.active {
+  background-color: $list-item-hover-color;
+}
+
+.item {
+  padding-left: $padding-left + 0.75rem;
+}

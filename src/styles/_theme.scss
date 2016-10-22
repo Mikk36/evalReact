@@ -1,0 +1,18 @@
+@import "~react-toolbox/lib/commons";
+@import "./colors";
+@import "./type";
+@import "./layout";
+
+//$color-primary: $palette-blue-500;
+//$color-primary-dark: $palette-blue-700;
+
+$list-item-hover-color: $palette-grey-200;
+$list-item-min-height: 3 * $unit;
+
+$footer-height: 8 * $unit;
+
+:global {
+  .material-icons {
+    line-height: inherit;
+  }
+}

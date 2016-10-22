@@ -1,0 +1,33 @@
+@import 'styles/theme';
+
+.drawerBrand {
+  height: $appbar-height - 1px;
+  padding-left: $padding-left;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.drawer {
+  @extend .noUserSelect;
+  width: $sidedrawer-width;
+  background-color: $color-white;
+  height: 100vh;
+  z-index: 2;
+  overflow-x: hidden;
+  border-right: 1px solid rgba(0, 0, 0, .2);
+}
+
+.divider {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, .2);
+}
+
+.imp .caption {
+  font-size: 1rem;
+}
+
+.selected {
+  font-size: 3rem;
+}

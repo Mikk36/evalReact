@@ -1,0 +1,21 @@
+/* LAYOUT CSS */
+@import "styles/theme";
+
+.content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content > header {
+  flex: 0 0 $appbar-height;
+}
+
+.content > section {
+  flex: 1 1 auto;
+  padding: 1rem;
+}
+
+.content > footer {
+  //flex: 0 0 var(--footer-height);
+}
