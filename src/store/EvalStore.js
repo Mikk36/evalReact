@@ -283,7 +283,6 @@ class EvalStore {
    * @param {Season} season
    */
   @action seasonAdded(key, season) {
-    console.info("seasonAdded", this._leagues.get(season.league).name, season.name);
     if (this._seasons.has(key)) {
       throw new Error("Why do we already have this season!?");
     }
@@ -296,7 +295,6 @@ class EvalStore {
    * @param {Season} season
    */
   @action seasonChanged(key, season) {
-    console.info("seasonChanged", this._leagues.get(season.league).name, season.name);
     if (!this._seasons.has(key)) {
       throw new Error("Why do we not have this season yet!?");
     }
@@ -309,7 +307,6 @@ class EvalStore {
    * @param {Season} season
    */
   @action seasonRemoved(key, season) {
-    console.info("seasonRemoved", this._leagues.get(season.league).name, season.name);
     if (!this._seasons.has(key)) {
       throw new Error("Why are we missing this season!?");
     }
@@ -348,7 +345,6 @@ class EvalStore {
    * @param {Rally} rally
    */
   @action rallyAdded(key, rally) {
-    console.info("rallyAdded", rally.name);
     if (this._rallies.has(key)) {
       throw new Error("Why do we already have this rally!?");
     }
@@ -361,7 +357,6 @@ class EvalStore {
    * @param {Rally} rally
    */
   @action rallyChanged(key, rally) {
-    console.info("rallyChanged", rally.name);
     if (!this._rallies.has(key)) {
       throw new Error("Why do we not have this rally yet!?");
     }
@@ -374,7 +369,6 @@ class EvalStore {
    * @param {Rally} rally
    */
   @action rallyRemoved(key, rally) {
-    console.info("rallyRemoved", rally.name);
     if (!this._rallies.has(key)) {
       throw new Error("Why are we missing this rally!?");
     }
