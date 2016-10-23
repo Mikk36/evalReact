@@ -36,17 +36,17 @@ export class LayoutStore {
     return this.sideBarOpen && this.breakpoint.su;
   }
 
-  @action handleResize() {
+  @action handleResize = () => {
     this.screen.width = window.innerWidth;
     this.screen.height = window.innerHeight;
     if (!this.breakpoint.su && this.sideBarOpen) {
       this.toggleSideBarOpen();
     }
-  }
+  };
 
-  @action toggleSideBarOpen() {
+  @action toggleSideBarOpen = () => {
     this.sideBarOpen = !this.sideBarOpen;
-  }
+  };
 }
 
 const layoutStore = new LayoutStore();
