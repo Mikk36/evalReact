@@ -43,10 +43,25 @@ class Rally extends Component {
     return (<span>{league.name} {season.name} {rally.name}</span>);
   }
 
+  getLatestTimestamp() {
+    const rally = this.evalStore.getRally(this.key);
+    if (!rally.eventIDList) {
+      return;
+    }
+    let timestamps = rally.eventIDList.map(id => this.evalStore.getLatestDataTimestamp(id));
+    timestamps = timestamps.filter(timestamp => timestamp !== null);
+    if (timestamps.length === 0) {
+      return;
+    }
+    timestamps.sort().reverse();
+    return new Date(timestamps[0]).toLocaleString("et-EE");
+  }
+
   render() {
     return (
         <div>
           <p>{this.getName()}</p>
+          <p>Latest data time: {this.getLatestTimestamp()}</p>
           <ul>
             {
               this.evalStore.getLatestRaces(this.key).map(race => {

@@ -12,10 +12,12 @@ class EvalStore {
   @observable _rallies = map({});
   @observable _races = map({});
   @observable _latestRaces = map({});
+  @observable _latestDataTimestamps = map({});
 
   listeningSeasonsList = [];
   listeningRalliesList = [];
   listeningRacesList = [];
+  listeningCacheTimestampList = [];
 
   /**
    * EvalStore constructor
@@ -142,6 +144,18 @@ class EvalStore {
       return {};
     }
     return this._nicks.get(nick);
+  }
+
+  /**
+   * Get the latest timestamp of an API Response
+   * @param {number} cacheId API cache ID
+   * @returns {string|null} Latest timestamp string or null
+   */
+  getLatestDataTimestamp(cacheId) {
+    if (!this._latestDataTimestamps.has(cacheId.toString())) {
+      return null;
+    }
+    return this._latestDataTimestamps.get(cacheId);
   }
 
   /**
@@ -349,6 +363,7 @@ class EvalStore {
       throw new Error("Why do we already have this rally!?");
     }
     this._rallies.set(key, rally);
+    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
   }
 
   /**
@@ -361,6 +376,7 @@ class EvalStore {
       throw new Error("Why do we not have this rally yet!?");
     }
     this._rallies.set(key, rally);
+    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
   }
 
   /**
@@ -450,6 +466,30 @@ class EvalStore {
     });
     latestRaces.reverse();
     this._latestRaces.set(rallyKey, latestRaces);
+  }
+
+  /**
+   * Listen for the latest timestamp of an API response
+   * @param {number} cacheId
+   */
+  listenLatestDataTimestamp(cacheId) {
+    if (this.listeningCacheTimestampList.indexOf(cacheId) >= 0) {
+      return;
+    }
+    this.listeningCacheTimestampList.push(cacheId);
+
+    console.log(`Listening cache timestamp for ${cacheId}`);
+
+    Fb.apiCache.child(`${cacheId}/timestamp`).on("value", snap => this.setLatestDataTimestamp(cacheId, snap.val()));
+  }
+
+  /**
+   * Save the latest timestamp of an API response
+   * @param {number} cacheId
+   * @param {string} timestamp
+   */
+  @action setLatestDataTimestamp(cacheId, timestamp) {
+    this._latestDataTimestamps.set(cacheId.toString(), timestamp);
   }
 
   /**
