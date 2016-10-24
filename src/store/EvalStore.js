@@ -332,25 +332,27 @@ class EvalStore {
    * @param {string} seasonKey Season key
    */
   listenRallies(seasonKey) {
-    if (this.listeningRalliesList.indexOf(seasonKey) >= 0) {
+    Fb.seasons.child(`${seasonKey}/rallies`).on("value", snap => {
+      const list = snap.val();
+      list.forEach(key => this.listenRally(key));
+    });
+  }
+
+  /**
+   * Set up listeners for a single rally
+   * @param {string} rallyKey Rally key
+   */
+  listenRally(rallyKey) {
+    if (this.listeningRalliesList.indexOf(rallyKey) >= 0) {
       return;
     }
-    this.listeningRalliesList.push(seasonKey);
+    this.listeningRalliesList.push(rallyKey);
 
-    console.log(`Listening rallies for ${seasonKey}`);
-    const ref = Fb.rallies.orderByChild("season").equalTo(seasonKey);
+    console.log(`Listening rallies for ${rallyKey}`);
+    const ref = Fb.rallies.orderByKey().equalTo(rallyKey);
     ref.on("child_added", snap => this.rallyAdded(snap.key, snap.val()));
     ref.on("child_changed", snap => this.rallyChanged(snap.key, snap.val()));
     ref.on("child_removed", snap => this.rallyRemoved(snap.key, snap.val()));
-  }
-
-  listenRally(rallyKey) {
-    if (this._rallies.has(rallyKey)) {
-      return;
-    }
-    Fb.rallies.child(rallyKey).once("value", snap => {
-      this.listenRallies(snap.val().season);
-    });
   }
 
   /**
@@ -363,7 +365,6 @@ class EvalStore {
       throw new Error("Why do we already have this rally!?");
     }
     this._rallies.set(key, rally);
-    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
   }
 
   /**
@@ -376,7 +377,6 @@ class EvalStore {
       throw new Error("Why do we not have this rally yet!?");
     }
     this._rallies.set(key, rally);
-    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
   }
 
   /**
@@ -469,8 +469,23 @@ class EvalStore {
   }
 
   /**
+   * Listen for timestamps of API responses for a rally
+   * @param {string} rallyKey Rally key
+   */
+  listenRallyDataTimestamps(rallyKey) {
+    if(!this._rallies.has(rallyKey)) {
+      return;
+    }
+    const rally = this._rallies.get(rallyKey);
+    if(!rally.hasOwnProperty("eventIDList")) {
+      return;
+    }
+    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
+  }
+
+  /**
    * Listen for the latest timestamp of an API response
-   * @param {number} cacheId
+   * @param {number} cacheId API response ID
    */
   listenLatestDataTimestamp(cacheId) {
     if (this.listeningCacheTimestampList.indexOf(cacheId) >= 0) {

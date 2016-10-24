@@ -48,6 +48,7 @@ class Rally extends Component {
     if (!rally.eventIDList) {
       return;
     }
+    this.evalStore.listenRallyDataTimestamps(this.key);
     let timestamps = rally.eventIDList.map(id => this.evalStore.getLatestDataTimestamp(id));
     timestamps = timestamps.filter(timestamp => timestamp !== null);
     if (timestamps.length === 0) {
