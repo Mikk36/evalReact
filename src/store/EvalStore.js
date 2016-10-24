@@ -348,7 +348,7 @@ class EvalStore {
     }
     this.listeningRalliesList.push(rallyKey);
 
-    console.log(`Listening rallies for ${rallyKey}`);
+    console.log(`Listening for rally ${rallyKey}`);
     const ref = Fb.rallies.orderByKey().equalTo(rallyKey);
     ref.on("child_added", snap => this.rallyAdded(snap.key, snap.val()));
     ref.on("child_changed", snap => this.rallyChanged(snap.key, snap.val()));
