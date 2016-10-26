@@ -3,6 +3,7 @@ import "./main.css";
 import React from "react";
 import {render} from "react-dom";
 import {useStrict} from "mobx";
+useStrict(true);
 import {Provider} from "mobx-react";
 import viewStore from "./store/ViewStore";
 import layoutStore from "./store/LayoutStore";
@@ -18,8 +19,6 @@ const stores = {
   layoutStore,
   evalStore
 };
-
-useStrict(true);
 
 const root = document.createElement("div");
 root.id = "app";
