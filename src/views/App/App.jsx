@@ -4,10 +4,10 @@ import {observer} from "mobx-react";
 
 import {BrowserRouter, Match, Miss} from "react-router";
 
-import Leagues from "views/Leagues/Leagues";
-import League from "views/League/League";
-import Season from "views/Season/Season";
-import Rally from "views/Rally/Rally";
+import Leagues from "views/Leagues/LeaguesView.jsx";
+import League from "views/League/LeagueView.jsx";
+import Season from "views/Season/SeasonView.jsx";
+import Rally from "views/Rally/RallyView.jsx";
 
 import Sidebar from "react-sidebar";
 import SideDrawer from "components/SideDrawer/SideDrawer";

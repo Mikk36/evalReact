@@ -3,7 +3,7 @@ import {observer} from "mobx-react";
 import {Link} from "react-router";
 
 @observer(["evalStore"])
-class Season extends Component {
+class SeasonView extends Component {
   /**
    * Season constructor
    * @param {EvalStore} evalStore EvalStore
@@ -41,4 +41,4 @@ class Season extends Component {
   }
 }
 
-export default Season;
+export default SeasonView;

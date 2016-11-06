@@ -1,5 +1,7 @@
 import {observable, computed, action, map} from "mobx";
 import Fb from "./FirebaseStore";
+import Rally from "./Rally";
+import Race from "./Race";
 
 /**
  * EvalStore
@@ -32,7 +34,7 @@ class EvalStore {
 
   /**
    * Get a sorted array of leagues
-   * @returns {Array.<League>}
+   * @returns {Array.<LeagueSpec>}
    */
   @computed get leagues() {
     const leagues = [];
@@ -45,7 +47,7 @@ class EvalStore {
   /**
    * Get a single league
    * @param {string} leagueKey League key
-   * @returns {League|Object} League or null
+   * @returns {LeagueSpec|Object} League or null
    */
   getLeague(leagueKey) {
     if (!this._leagues.has(leagueKey)) {
@@ -57,7 +59,7 @@ class EvalStore {
   /**
    * Get a sorted array of seasons
    * @param {string} leagueKey League key
-   * @returns {Array.<Season>} Sorted list of seasons for a league
+   * @returns {Array.<SeasonSpec>} Sorted list of seasons for a league
    */
   getSeasons(leagueKey) {
     if (!this._leagues.has(leagueKey)) {
@@ -79,7 +81,7 @@ class EvalStore {
   /**
    * Get a single season
    * @param {string} seasonKey Season key
-   * @returns {Season|Object} Season or null
+   * @returns {SeasonSpec|Object} Season or null
    */
   getSeason(seasonKey) {
     if (!this._seasons.has(seasonKey)) {
@@ -102,9 +104,7 @@ class EvalStore {
       if (!this._rallies.has(rallyKey)) {
         return;
       }
-      const rally = this._rallies.get(rallyKey);
-      rally.key = rallyKey;
-      return rally;
+      return this._rallies.get(rallyKey);
     });
     rallies = rallies.filter(rally => typeof rally !== "undefined");
     return rallies.sort(EvalStore.rallyComparator);
@@ -113,7 +113,7 @@ class EvalStore {
   /**
    * Get a single rally
    * @param {string} rallyKey Rally key
-   * @returns {Rally|Object} Rally or null
+   * @returns {Rally|Object} Rally or empty object
    */
   getRally(rallyKey) {
     if (!this._rallies.has(rallyKey)) {
@@ -125,7 +125,7 @@ class EvalStore {
   /**
    * Get latest races of a rally
    * @param {string} rallyKey Rally key
-   * @returns {Array.<Race>|[]} Rally or null
+   * @returns {Array.<RaceSpec>|[]} Rally or null
    */
   getLatestRaces(rallyKey) {
     if (!this._latestRaces.has(rallyKey)) {
@@ -137,7 +137,7 @@ class EvalStore {
   /**
    * Get a driver by nick
    * @param {string} nick Nickname
-   * @returns {Driver|Object} Driver
+   * @returns {DriverSpec|Object} Driver
    */
   getDriver(nick) {
     if (!this._nicks.has(nick)) {
@@ -179,7 +179,7 @@ class EvalStore {
   /**
    * League added to DB
    * @param {string} key
-   * @param {League} league
+   * @param {LeagueSpec} league
    */
   @action leagueAdded(key, league) {
     if (this._leagues.has(key)) {
@@ -192,7 +192,7 @@ class EvalStore {
   /**
    * League changed in DB
    * @param {string} key
-   * @param {League} league
+   * @param {LeagueSpec} league
    */
   @action leagueChanged(key, league) {
     if (!this._leagues.has(key)) {
@@ -204,7 +204,7 @@ class EvalStore {
   /**
    * League removed from DB
    * @param {string} key
-   * @param {League} league
+   * @param {LeagueSpec} league
    */
   @action leagueRemoved(key, league) {
     if (!this._leagues.has(key)) {
@@ -226,7 +226,7 @@ class EvalStore {
   /**
    * Driver added to DB
    * @param {string} name Driver name
-   * @param {Driver} driver Driver data
+   * @param {DriverSpec} driver Driver data
    */
   @action driverAdded(name, driver) {
     if (this._drivers.has(name)) {
@@ -242,7 +242,7 @@ class EvalStore {
   /**
    * Driver changed in DB
    * @param {string} name Driver name
-   * @param {Driver} driver Driver data
+   * @param {DriverSpec} driver Driver data
    */
   @action driverChanged(name, driver) {
     if (!this._drivers.has(name)) {
@@ -262,7 +262,7 @@ class EvalStore {
   /**
    * Driver removed from DB
    * @param {string} name Driver name
-   * @param {Driver} driver Driver data
+   * @param {DriverSpec} driver Driver data
    */
   @action driverRemoved(name, driver) {
     if (!this._drivers.has(name)) {
@@ -294,7 +294,7 @@ class EvalStore {
   /**
    * Season added to DB
    * @param {string} key
-   * @param {Season} season
+   * @param {SeasonSpec} season
    */
   @action seasonAdded(key, season) {
     if (this._seasons.has(key)) {
@@ -306,7 +306,7 @@ class EvalStore {
   /**
    * Season changed in DB
    * @param {string} key
-   * @param {Season} season
+   * @param {SeasonSpec} season
    */
   @action seasonChanged(key, season) {
     if (!this._seasons.has(key)) {
@@ -318,7 +318,7 @@ class EvalStore {
   /**
    * Season removed from DB
    * @param {string} key
-   * @param {Season} season
+   * @param {SeasonSpec} season
    */
   @action seasonRemoved(key, season) {
     if (!this._seasons.has(key)) {
@@ -358,31 +358,31 @@ class EvalStore {
   /**
    * Rally added to DB
    * @param {string} key
-   * @param {Rally} rally
+   * @param {RallySpec} rally
    */
   @action rallyAdded(key, rally) {
     if (this._rallies.has(key)) {
       throw new Error("Why do we already have this rally!?");
     }
-    this._rallies.set(key, rally);
+    this._rallies.set(key, new Rally(key, rally, this));
   }
 
   /**
    * Rally changed in DB
    * @param {string} key
-   * @param {Rally} rally
+   * @param {RallySpec} rally
    */
   @action rallyChanged(key, rally) {
     if (!this._rallies.has(key)) {
       throw new Error("Why do we not have this rally yet!?");
     }
-    this._rallies.set(key, rally);
+    this._rallies.get(key).updateRally(rally);
   }
 
   /**
    * Rally removed from DB
    * @param {string} key
-   * @param {Rally} rally
+   * @param {RallySpec} rally
    */
   @action rallyRemoved(key, rally) {
     if (!this._rallies.has(key)) {
@@ -415,35 +415,33 @@ class EvalStore {
    * Race added to DB
    * @param {string} rallyKey
    * @param {string} key
-   * @param {Race} race
+   * @param {RaceSpec} race
    */
   @action raceAdded(rallyKey, key, race) {
     if (this._races.get(rallyKey).has(key)) {
       throw new Error("Why do we already have this race!?");
     }
-    race.key = key;
-    this._races.get(rallyKey).set(key, race);
+    this._races.get(rallyKey).set(key, new Race(key, race, this, rallyKey));
   }
 
   /**
    * Race changed in DB
    * @param {string} rallyKey
    * @param {string} key
-   * @param {Race} race
+   * @param {RaceSpec} race
    */
   @action raceChanged(rallyKey, key, race) {
     if (!this._races.get(rallyKey).has(key)) {
       throw new Error("Why do we not have this race yet!?");
     }
-    race.key = key;
-    this._races.get(rallyKey).set(key, race);
+    this._races.get(rallyKey).get(key).updateRace(race);
   }
 
   /**
    * Race removed from DB
    * @param {string} rallyKey
    * @param {string} key
-   * @param {Race} race
+   * @param {RaceSpec} race
    */
   @action raceRemoved(rallyKey, key, race) {
     if (!this._races.get(rallyKey).has(key)) {
@@ -509,8 +507,8 @@ class EvalStore {
 
   /**
    * Sort leagues by order property
-   * @param {League} league1 League for sorting
-   * @param {League} league2 League for sorting
+   * @param {LeagueSpec} league1 League for sorting
+   * @param {LeagueSpec} league2 League for sorting
    * @returns {number} Sorting comparator result
    */
   static leagueComparator(league1, league2) {
@@ -519,8 +517,8 @@ class EvalStore {
 
   /**
    * Sort seasons by name
-   * @param {Season} season1 League for sorting
-   * @param {Season} season2 League for sorting
+   * @param {SeasonSpec} season1 League for sorting
+   * @param {SeasonSpec} season2 League for sorting
    * @returns {number} Sorting comparator result
    */
   static seasonComparator(season1, season2) {
@@ -529,8 +527,8 @@ class EvalStore {
 
   /**
    * Sort rallies by name
-   * @param {Rally} rally1 Rally for sorting
-   * @param {Rally} rally2 Rally for sorting
+   * @param {RallySpec} rally1 Rally for sorting
+   * @param {RallySpec} rally2 Rally for sorting
    * @returns {number} Sorting comparator result
    */
   static rallyComparator(rally1, rally2) {
@@ -539,7 +537,7 @@ class EvalStore {
 
   /**
    * League
-   * @typedef {Object} League
+   * @typedef {Object} LeagueSpec
    * @property {string} name
    * @property {number} order
    * @property {Array.<string>|undefined} seasons
@@ -547,7 +545,7 @@ class EvalStore {
 
   /**
    * Season
-   * @typedef {Object} Season
+   * @typedef {Object} SeasonSpec
    * @property {string} name
    * @property {string} league
    * @property {number} stages
@@ -557,7 +555,7 @@ class EvalStore {
 
   /**
    * Rally
-   * @typedef {Object} Rally
+   * @typedef {Object} RallySpec
    * @property {string} name
    * @property {string} league
    * @property {string} season
@@ -569,20 +567,20 @@ class EvalStore {
 
   /**
    * Driver
-   * @typedef {Object} Driver
+   * @typedef {Object} DriverSpec
    * @property {string} name
    * @property {Array.<string>} nicks
    */
 
   /**
    * Nick
-   * @typedef {Object} Nick
+   * @typedef {Object} NickSpec
    * @property {string} name
    */
 
   /**
    * Race
-   * @typedef {Object} Race
+   * @typedef {Object} RaceSpec
    * @property {boolean} assists
    * @property {string} car
    * @property {number} stage

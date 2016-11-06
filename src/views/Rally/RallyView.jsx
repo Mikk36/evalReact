@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 
 @observer(["evalStore"])
-class Rally extends Component {
+class RallyView extends Component {
   /**
    * Season constructor
    * @param {EvalStore} evalStore EvalStore
@@ -38,24 +38,35 @@ class Rally extends Component {
 
   getName() {
     const rally = this.evalStore.getRally(this.key);
-    const season = this.evalStore.getSeason(rally.season);
-    const league = this.evalStore.getLeague(season.league);
-    return (<span>{league.name} {season.name} {rally.name}</span>);
+    if (!rally.key) {
+      return;
+    }
+    return (<span>{rally.league.name} {rally.season.name} {rally.name}</span>);
   }
 
   getLatestTimestamp() {
+    const timestamp = this.evalStore.getRally(this.key).latestTimestamp;
+    if (!timestamp) {
+      return;
+    }
+    return new Date(timestamp).toLocaleString("et-EE");
+  }
+
+  getLatestRaces() {
     const rally = this.evalStore.getRally(this.key);
-    if (!rally.eventIDList) {
+    if (!rally.key) {
       return;
     }
-    this.evalStore.listenRallyDataTimestamps(this.key);
-    let timestamps = rally.eventIDList.map(id => this.evalStore.getLatestDataTimestamp(id));
-    timestamps = timestamps.filter(timestamp => timestamp !== null);
-    if (timestamps.length === 0) {
-      return;
-    }
-    timestamps.sort().reverse();
-    return new Date(timestamps[0]).toLocaleString("et-EE");
+    return rally.latestRaces.map(race => {
+      return (
+          <li key={race.key}>
+            {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
+            Driver: {this.evalStore.getDriver(race.userName).name}&nbsp;
+            Stage: {race.stage}&nbsp;
+            Time: {RallyView.formatRaceTime(race.time)}
+          </li>
+      );
+    });
   }
 
   render() {
@@ -64,22 +75,11 @@ class Rally extends Component {
           <p>{this.getName()}</p>
           <p>Latest data time: {this.getLatestTimestamp()}</p>
           <ul>
-            {
-              this.evalStore.getLatestRaces(this.key).map(race => {
-                return (
-                    <li key={race.key}>
-                      {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
-                      Driver: {this.evalStore.getDriver(race.userName).name}&nbsp;
-                      Stage: {race.stage}&nbsp;
-                      Time: {Rally.formatRaceTime(race.time)}
-                    </li>
-                );
-              })
-            }
+            {this.getLatestRaces()}
           </ul>
         </div>
     );
   }
 }
 
-export default Rally;
+export default RallyView;

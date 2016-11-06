@@ -3,7 +3,7 @@ import {observer} from "mobx-react";
 import {Link} from "react-router";
 
 @observer(["evalStore"])
-class Leagues extends Component {
+class LeaguesView extends Component {
   constructor({evalStore}) {
     super();
 
@@ -28,4 +28,4 @@ class Leagues extends Component {
   }
 }
 
-export default Leagues;
+export default LeaguesView;
