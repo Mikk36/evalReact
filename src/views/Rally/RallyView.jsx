@@ -3,6 +3,8 @@ import {observer} from "mobx-react";
 
 @observer(["evalStore"])
 class RallyView extends Component {
+  evalStore = null;
+
   /**
    * Season constructor
    * @param {EvalStore} evalStore EvalStore

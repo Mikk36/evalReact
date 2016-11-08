@@ -4,6 +4,8 @@ import {Link} from "react-router";
 
 @observer(["evalStore"])
 class LeagueView extends Component {
+  evalStore = null;
+
   /**
    * League constructor
    * @param {EvalStore} evalStore EvalStore

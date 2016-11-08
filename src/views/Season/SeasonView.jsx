@@ -4,6 +4,8 @@ import {Link} from "react-router";
 
 @observer(["evalStore"])
 class SeasonView extends Component {
+  evalStore = null;
+
   /**
    * Season constructor
    * @param {EvalStore} evalStore EvalStore

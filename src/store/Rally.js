@@ -1,4 +1,5 @@
-import {observable, computed, action} from "mobx";
+import {observable, computed, action, map} from "mobx";
+import Fb from "./FirebaseStore";
 
 export default class Rally {
   @observable key = "rally key";
@@ -8,6 +9,11 @@ export default class Rally {
   @observable finished = true;
   @observable eventIDList = [];
   @observable restarterList = [];
+  @observable races = map({});
+  _listeningForRaces = false;
+  @observable latestRaces = [];
+
+  evalStore = null;
 
   /**
    * Rally constructor
@@ -19,6 +25,10 @@ export default class Rally {
     this.evalStore = evalStore;
     this.key = key;
     this.updateRally(rally);
+
+    if (this.evalStore.listeningRacesList.includes(key)) {
+      this.listenRaces();
+    }
   }
 
   /**
@@ -73,7 +83,61 @@ export default class Rally {
     return timestamps[0];
   }
 
-  @computed get latestRaces() {
-    return this.evalStore.getLatestRaces(this.key);
+  /**
+   * Add a race to the rally
+   * @param {string} key Race key
+   * @param {RaceSpec} race Race data
+   */
+  @action addRace(key, race) {
+    this.updateRace(key, race);
+  }
+
+  /**
+   * Update a race of the rally
+   * @param {string} key Race key
+   * @param {RaceSpec} race Race data
+   */
+  @action updateRace(key, race) {
+    this.races.set(key, race);
+  }
+
+  /**
+   * Remove a race from the rally
+   * @param {string} key Race key
+   */
+  @action removeRace(key) {
+    this.races.delete(key);
+  }
+
+  /**
+   * Set up listeners for races
+   */
+  @action listenRaces() {
+    if (this._listeningForRaces) {
+      return;
+    }
+
+    console.log(`Listening races for ${this.key}`);
+
+    const ref = Fb.races.child(this.key);
+    ref.on("child_added", snap => this.addRace(snap.key, snap.val()));
+    ref.on("child_changed", snap => this.updateRace(snap.key, snap.val()));
+    ref.on("child_removed", snap => this.removeRace(snap.key));
+    ref.orderByChild("timestamp").limitToLast(10).on("value", snap => this.setLatestRaces(snap));
+  }
+
+  /**
+   * Set the latest races
+   * @param {firebase.database.DataSnapshot} snap
+   */
+  @action setLatestRaces(snap) {
+    const latestRaces = [];
+    snap.forEach(raceSnap => {
+      const race = raceSnap.val();
+      race.key = raceSnap.key;
+      latestRaces.push(race);
+    });
+    latestRaces.reverse();
+    this.latestRaces.replace(latestRaces);
   }
 }

@@ -1,7 +1,6 @@
 import {observable, computed, action, map} from "mobx";
 import Fb from "./FirebaseStore";
 import Rally from "./Rally";
-import Race from "./Race";
 
 /**
  * EvalStore
@@ -13,7 +12,6 @@ class EvalStore {
   @observable _seasons = map({});
   @observable _rallies = map({});
   @observable _races = map({});
-  @observable _latestRaces = map({});
   @observable _latestDataTimestamps = map({});
 
   listeningSeasonsList = [];
@@ -120,18 +118,6 @@ class EvalStore {
       return {};
     }
     return this._rallies.get(rallyKey);
-  }
-
-  /**
-   * Get latest races of a rally
-   * @param {string} rallyKey Rally key
-   * @returns {Array.<RaceSpec>|[]} Rally or null
-   */
-  getLatestRaces(rallyKey) {
-    if (!this._latestRaces.has(rallyKey)) {
-      return [];
-    }
-    return this._latestRaces.get(rallyKey);
   }
 
   /**
@@ -392,78 +378,17 @@ class EvalStore {
   }
 
   /**
-   * Set up listeners for races of a specific rally
-   * @param {string} rallyKey Season key
+   * Listen to races of a rally
+   * @param {string} key Rally key
    */
-  @action listenRaces(rallyKey) {
-    if (this.listeningRacesList.indexOf(rallyKey) >= 0) {
+  @action listenRaces(key) {
+    if (this.listeningRacesList.includes(key)) {
       return;
     }
-    this.listeningRacesList.push(rallyKey);
-
-    console.log(`Listening races for ${rallyKey}`);
-    this._races.set(rallyKey, map({}));
-
-    const ref = Fb.races.child(rallyKey);
-    ref.on("child_added", snap => this.raceAdded(rallyKey, snap.key, snap.val()));
-    ref.on("child_changed", snap => this.raceChanged(rallyKey, snap.key, snap.val()));
-    ref.on("child_removed", snap => this.raceRemoved(rallyKey, snap.key, snap.val()));
-    ref.orderByChild("timestamp").limitToLast(10).on("value", snap => this.setLatestRaces(rallyKey, snap));
-  }
-
-  /**
-   * Race added to DB
-   * @param {string} rallyKey
-   * @param {string} key
-   * @param {RaceSpec} race
-   */
-  @action raceAdded(rallyKey, key, race) {
-    if (this._races.get(rallyKey).has(key)) {
-      throw new Error("Why do we already have this race!?");
+    this.listeningRacesList.push(key);
+    if (this._rallies.has(key)) {
+      this._rallies.get(key).listenRaces();
     }
-    this._races.get(rallyKey).set(key, new Race(key, race, this, rallyKey));
-  }
-
-  /**
-   * Race changed in DB
-   * @param {string} rallyKey
-   * @param {string} key
-   * @param {RaceSpec} race
-   */
-  @action raceChanged(rallyKey, key, race) {
-    if (!this._races.get(rallyKey).has(key)) {
-      throw new Error("Why do we not have this race yet!?");
-    }
-    this._races.get(rallyKey).get(key).updateRace(race);
-  }
-
-  /**
-   * Race removed from DB
-   * @param {string} rallyKey
-   * @param {string} key
-   * @param {RaceSpec} race
-   */
-  @action raceRemoved(rallyKey, key, race) {
-    if (!this._races.get(rallyKey).has(key)) {
-      throw new Error("Why are we missing this race!?");
-    }
-    this._races.get(rallyKey).delete(key);
-  }
-
-  /**
-   * Set latest races for a rally
-   * @param {string} rallyKey
-   * @param {firebase.database.DataSnapshot} snap
-   */
-  @action setLatestRaces(rallyKey, snap) {
-    const latestRaces = [];
-    snap.forEach(raceSnap => {
-      const race = raceSnap.val();
-      race.key = raceSnap.key;
-      latestRaces.push(race);
-    });
-    latestRaces.reverse();
-    this._latestRaces.set(rallyKey, latestRaces);
   }
 
   /**
@@ -471,11 +396,11 @@ class EvalStore {
    * @param {string} rallyKey Rally key
    */
   listenRallyDataTimestamps(rallyKey) {
-    if(!this._rallies.has(rallyKey)) {
+    if (!this._rallies.has(rallyKey)) {
       return;
     }
     const rally = this._rallies.get(rallyKey);
-    if(!rally.hasOwnProperty("eventIDList")) {
+    if (!rally.hasOwnProperty("eventIDList")) {
       return;
     }
     rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
@@ -486,7 +411,7 @@ class EvalStore {
    * @param {number} cacheId API response ID
    */
   listenLatestDataTimestamp(cacheId) {
-    if (this.listeningCacheTimestampList.indexOf(cacheId) >= 0) {
+    if (this.listeningCacheTimestampList.contains(cacheId)) {
       return;
     }
     this.listeningCacheTimestampList.push(cacheId);

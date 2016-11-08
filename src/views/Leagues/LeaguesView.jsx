@@ -4,6 +4,8 @@ import {Link} from "react-router";
 
 @observer(["evalStore"])
 class LeaguesView extends Component {
+  evalStore = null;
+
   constructor({evalStore}) {
     super();
 

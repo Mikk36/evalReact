@@ -10,6 +10,8 @@ export default class Race {
   @observable car = "car name";
   @observable assists = false;
 
+  evalStore = null;
+
   /**
    * Race constructor
    * @param {string} key Race key
