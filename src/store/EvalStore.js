@@ -411,7 +411,7 @@ class EvalStore {
    * @param {number} cacheId API response ID
    */
   listenLatestDataTimestamp(cacheId) {
-    if (this.listeningCacheTimestampList.contains(cacheId)) {
+    if (this.listeningCacheTimestampList.includes(cacheId)) {
       return;
     }
     this.listeningCacheTimestampList.push(cacheId);
