@@ -63,7 +63,7 @@ class RallyView extends Component {
       return (
           <li key={race.key}>
             {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
-            Driver: {this.evalStore.getDriver(race.userName).name}&nbsp;
+            Driver: {this.evalStore.getDriver(race.userName).name || race.userName}&nbsp;
             Stage: {race.stage}&nbsp;
             Time: {RallyView.formatRaceTime(race.time)}
           </li>
