@@ -18,6 +18,7 @@ export const races = db.ref("races");
 export const drivers = db.ref("drivers");
 export const rallyTeams = db.ref("rallyTeams");
 export const apiCache = db.ref("apiCache");
+export const eventData = db.ref("eventData");
 
 export default {
   db,
@@ -29,5 +30,6 @@ export default {
   races,
   drivers,
   rallyTeams,
-  apiCache
+  apiCache,
+  eventData
 };

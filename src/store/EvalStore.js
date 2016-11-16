@@ -11,13 +11,10 @@ class EvalStore {
   @observable _leagues = map({});
   @observable _seasons = map({});
   @observable _rallies = map({});
-  @observable _races = map({});
-  @observable _latestDataTimestamps = map({});
 
   listeningSeasonsList = [];
   listeningRalliesList = [];
   listeningRacesList = [];
-  listeningCacheTimestampList = [];
 
   /**
    * EvalStore constructor
@@ -130,18 +127,6 @@ class EvalStore {
       return {};
     }
     return this._nicks.get(nick);
-  }
-
-  /**
-   * Get the latest timestamp of an API Response
-   * @param {number} cacheId API cache ID
-   * @returns {string|null} Latest timestamp string or null
-   */
-  getLatestDataTimestamp(cacheId) {
-    if (!this._latestDataTimestamps.has(cacheId.toString())) {
-      return null;
-    }
-    return this._latestDataTimestamps.get(cacheId);
   }
 
   /**
@@ -392,45 +377,6 @@ class EvalStore {
   }
 
   /**
-   * Listen for timestamps of API responses for a rally
-   * @param {string} rallyKey Rally key
-   */
-  listenRallyDataTimestamps(rallyKey) {
-    if (!this._rallies.has(rallyKey)) {
-      return;
-    }
-    const rally = this._rallies.get(rallyKey);
-    if (!rally.hasOwnProperty("eventIDList")) {
-      return;
-    }
-    rally.eventIDList.forEach(id => this.listenLatestDataTimestamp(id));
-  }
-
-  /**
-   * Listen for the latest timestamp of an API response
-   * @param {number} cacheId API response ID
-   */
-  listenLatestDataTimestamp(cacheId) {
-    if (this.listeningCacheTimestampList.includes(cacheId)) {
-      return;
-    }
-    this.listeningCacheTimestampList.push(cacheId);
-
-    console.log(`Listening cache timestamp for ${cacheId}`);
-
-    Fb.apiCache.child(`${cacheId}/timestamp`).on("value", snap => this.setLatestDataTimestamp(cacheId, snap.val()));
-  }
-
-  /**
-   * Save the latest timestamp of an API response
-   * @param {number} cacheId
-   * @param {string} timestamp
-   */
-  @action setLatestDataTimestamp(cacheId, timestamp) {
-    this._latestDataTimestamps.set(cacheId.toString(), timestamp);
-  }
-
-  /**
    * Sort leagues by order property
    * @param {LeagueSpec} league1 League for sorting
    * @param {LeagueSpec} league2 League for sorting
@@ -513,6 +459,27 @@ class EvalStore {
    * @property {string} timestamp
    * @property {string} userName
    * @property {string} key
+   */
+
+  /**
+   * Event
+   * @typedef {Object} EventSpec
+   * @property {Array.<StageSpec>} stages Array of stage information
+   * @property {string|number} timestamp Response data timestamp
+   */
+
+  /**
+   * Stage information
+   * @typedef {Object} StageSpec
+   * @property {boolean} HasServiceArea If stage has a service area
+   * @property {string} LocationImage Location image address
+   * @property {string} LocationName Location name
+   * @property {string} StageImage Stage map image address
+   * @property {string} StageName Stage name
+   * @property {string} TimeOfDay Time of day of the event (morning, night etc)
+   * @property {string} WeatherImageAltUrl White weather image address
+   * @property {string} WeatherImageUrl Colour weather image address
+   * @property {string} WeatherText Weather description (Clear, rain etc)
    */
 }
 

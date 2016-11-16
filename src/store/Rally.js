@@ -8,10 +8,13 @@ export default class Rally {
   @observable seasonKey = "season key";
   @observable finished = true;
   @observable eventIDList = [];
+  @observable eventData = map({});
   @observable restarterList = [];
   @observable races = map({});
   _listeningForRaces = false;
   @observable latestRaces = [];
+
+  eventDataListeners = {};
 
   evalStore = null;
 
@@ -24,11 +27,20 @@ export default class Rally {
   constructor(key, rally, evalStore) {
     this.evalStore = evalStore;
     this.key = key;
+
+    this.createEventDataListeners();
+
     this.updateRally(rally);
 
     if (this.evalStore.listeningRacesList.includes(key)) {
       this.listenRaces();
     }
+  }
+
+  createEventDataListeners() {
+    this.eventDataListeners.added = snap => this.addEventData(snap.key, snap.val());
+    this.eventDataListeners.changed = snap => this.updateEventData(snap.key, snap.val());
+    this.eventDataListeners.removed = snap => this.removeEventData(snap.key);
   }
 
   /**
@@ -40,7 +52,11 @@ export default class Rally {
     this.leagueKey = rally.league;
     this.seasonKey = rally.season;
     this.finished = rally.finished;
-    this.eventIDList.replace(rally.eventIDList);
+    if (!this.compareEventIDArrays(this.eventIDList, rally.eventIDList)) {
+      this.unListenEventData();
+      this.eventIDList.replace(rally.eventIDList);
+      this.listenEventData();
+    }
     this.restarterList.replace(rally.restarters);
   }
 
@@ -69,11 +85,13 @@ export default class Rally {
   }
 
   @computed get latestTimestamp() {
-    if (this.eventIDList.length === 0) {
+    if (this.eventData.size === 0) {
       return;
     }
-    this.evalStore.listenRallyDataTimestamps(this.key);
-    let timestamps = this.eventIDList.map(id => this.evalStore.getLatestDataTimestamp(id));
+    let timestamps = [];
+    this.eventData.forEach(event => {
+      timestamps.push(event.timestamp);
+    });
     timestamps = timestamps.filter(timestamp => timestamp !== null);
     if (timestamps.length === 0) {
       return;
@@ -116,6 +134,7 @@ export default class Rally {
     if (this._listeningForRaces) {
       return;
     }
+    this._listeningForRaces = true;
 
     console.log(`Listening races for ${this.key}`);
 
@@ -139,5 +158,59 @@ export default class Rally {
     });
     latestRaces.reverse();
     this.latestRaces.replace(latestRaces);
+  }
+
+  listenEventData() {
+    this.eventIDList.forEach(id => {
+      const ref = Fb.eventData.orderByKey().equalTo(String(id));
+      ref.on("child_added", this.eventDataListeners.added);
+      ref.on("child_changed", this.eventDataListeners.changed);
+      ref.on("child_removed", this.eventDataListeners.removed);
+    });
+  }
+
+  unListenEventData() {
+    this.eventIDList.forEach(id => {
+      const ref = Fb.eventData.child(id);
+      ref.off("child_added", this.eventDataListeners.added);
+      ref.off("child_changed", this.eventDataListeners.changed);
+      ref.off("child_removed", this.eventDataListeners.removed);
+    });
+  }
+
+  /**
+   * Add an event
+   * @param {string} key Event key
+   * @param {EventSpec} data Event data
+   */
+  @action addEventData(key, data) {
+    this.updateEventData(key, data);
+  }
+
+  /**
+   * Update an event
+   * @param {string} key Event key
+   * @param {EventSpec} data Event data
+   */
+  @action updateEventData(key, data) {
+    this.eventData.set(key, data);
+  }
+
+  /**
+   * Remove an event
+   * @param {string} key Event key
+   */
+  @action removeEventData(key) {
+    this.eventData.delete(key);
+  }
+
+  /**
+   * Compare two arrays of event IDs and return true, if equal
+   * @param {Array.<number>} oldArray Old array of event IDs
+   * @param {Array.<number>} newArray New array of event IDs
+   * @returns {boolean} True, if arrays are equal
+   */
+  compareEventIDArrays(oldArray, newArray) {
+    return oldArray.length === newArray.length && oldArray.every((id, i) => id === newArray[i]);
   }
 }
