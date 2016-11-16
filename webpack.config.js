@@ -105,7 +105,7 @@ module.exports = {
       {
         test: /\.jsx?$/,
         include: path.join(__dirname, "src"),
-        loader: "babel",
+        loader: "babel-loader",
         query: {
           // cacheDirectory: isDev ? "babel" : null,
           presets: [[
@@ -129,11 +129,11 @@ module.exports = {
       {
         test: /(\.scss|\.css)$/,
         loader: ExtractTextPlugin.extract({
-          fallbackLoader: "style",
+          fallbackLoader: "style-loader",
           loader: [
-            "css?sourceMap&importLoaders=2&modules&localIdentName=[name]__[local]___[hash:base64:5]",
-            "postcss",
-            "sass?outputStyle=expanded&sourceMap&sourceMapContents"
+            "css-loader?sourceMap&importLoaders=2&modules&localIdentName=[name]__[local]___[hash:base64:5]",
+            "postcss-loader",
+            "sass-loader?outputStyle=expanded&sourceMap&sourceMapContents"
           ].join("!")
         })
       },
