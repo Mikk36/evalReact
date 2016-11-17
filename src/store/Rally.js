@@ -76,6 +76,12 @@ export default class Rally {
     return this.evalStore.getSeason(this.seasonKey);
   }
 
+  @computed get stages() {
+    const season = this.evalStore.getSeason(this.seasonKey);
+    if (!season.name) return 0;
+    return season.stages;
+  }
+
   @computed get restarters() {
     const list = [];
     for (const name of this.restarterList) {
@@ -106,7 +112,7 @@ export default class Rally {
    * @param {string} key Race key
    * @param {RaceSpec} race Race data
    */
-  @action addRace(key, race) {
+  addRace(key, race) {
     this.updateRace(key, race);
   }
 
@@ -130,7 +136,7 @@ export default class Rally {
   /**
    * Set up listeners for races
    */
-  @action listenRaces() {
+  listenRaces() {
     if (this._listeningForRaces) {
       return;
     }
@@ -183,7 +189,7 @@ export default class Rally {
    * @param {string} key Event key
    * @param {EventSpec} data Event data
    */
-  @action addEventData(key, data) {
+  addEventData(key, data) {
     this.updateEventData(key, data);
   }
 
@@ -212,5 +218,21 @@ export default class Rally {
    */
   compareEventIDArrays(oldArray, newArray) {
     return oldArray.length === newArray.length && oldArray.every((id, i) => id === newArray[i]);
+  }
+
+  /**
+   * Get races for a stage
+   * @param {number} stage Stage number
+   * @returns {Array.<RaceSpec>} Array of races ordered by time
+   */
+  getRaces(stage) {
+    const races = [];
+    this.races.forEach(/** RaceSpec */ race => {
+      if (race.stage === stage) races.push(race);
+    });
+
+    races.sort((race1, race2) => race1.time - race2.time);
+
+    return races;
   }
 }
