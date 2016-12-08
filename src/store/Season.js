@@ -6,6 +6,7 @@ export default class Season {
   @observable leagueKey = "league key";
   @observable rallyList = [];
   @observable classes = map({});
+  @observable stages = 0;
 
   evalStore = null;
 
@@ -30,10 +31,9 @@ export default class Season {
     this.name = season.name;
     this.leagueKey = season.league;
     this.rallyList.replace(season.rallies);
+    this.stages = season.stages;
     this.classes.clear();
-    // Object.keys(season.classes).map(key => this.classes.set(key, season.classes[key]));
     this.classes.merge(season.classes);
-    console.log(this.classes.entries());
   }
 
   /**

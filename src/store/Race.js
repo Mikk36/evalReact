@@ -24,7 +24,6 @@ export default class Race {
     this.key = key;
     this.rally = rally;
     this.updateRace(race);
-    console.log(this);
   }
 
   /**

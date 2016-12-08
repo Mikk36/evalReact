@@ -116,13 +116,12 @@ class RallyView extends Component {
   };
 
   getTabs() {
-    const rally = this.evalStore.getRally(this.key);
-    if (!rally.key) return [];
+    if (!this.rally.key) return [];
 
     const tabs = [];
-    const stages = rally.stages;
+    const stages = this.rally.season.stages;
     for (let stageNum = 1; stageNum <= stages; stageNum++) {
-      const races = rally.getRaces(stageNum);
+      const races = this.rally.getRaces(stageNum);
       const data = races.map((race, index) => {
         return {
           place: index + 1,
