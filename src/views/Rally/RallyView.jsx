@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
+import {computed} from "mobx";
 import {Tab, Tabs, Table} from "react-toolbox";
 
 @observer(["evalStore"])
@@ -26,6 +27,11 @@ class RallyView extends Component {
 
     this.evalStore.listenRally(this.key);
     this.evalStore.listenRaces(this.key);
+  }
+
+  @computed get rally() {
+    console.log("Getting rally", this.key);
+    return this.evalStore.getRally(this.key);
   }
 
   static formatRaceTime(time) {
@@ -65,30 +71,28 @@ class RallyView extends Component {
   }
 
   getName() {
-    const rally = this.evalStore.getRally(this.key);
-    if (!rally.key) {
+    if (!this.rally.key) {
       return;
     }
-    return (<span>{rally.league.name} {rally.season.name} {rally.name}</span>);
+    return (<span>{this.rally.league.name} {this.rally.season.name} {this.rally.name}</span>);
   }
 
   getLatestTimestamp() {
-    const timestamp = this.evalStore.getRally(this.key).latestTimestamp;
-    if (!timestamp) {
+    if (!this.rally.timestamp) {
       return;
     }
-    return new Date(timestamp).toLocaleString("et-EE");
+    return new Date(this.rally.timestamp).toLocaleString("et-EE");
   }
 
   getLatestRaces() {
-    const rally = this.evalStore.getRally(this.key);
-    if (!rally.key) {
+    if (!this.rally.key) {
       return;
     }
-    return rally.latestRaces.map(race => {
+    return this.rally.latestRaces.map(race => {
       return (
           <li key={race.key}>
             {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
+            Class: {race.vehicleClass.name}&nbsp;
             Driver: {this.evalStore.getDriver(race.userName).name || race.userName}&nbsp;
             Stage: {race.stage}&nbsp;
             Time: {RallyView.formatRaceTime(race.time)}

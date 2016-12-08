@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {computed} from "mobx";
 import {observer} from "mobx-react";
 import {Link} from "react-router";
 
@@ -17,10 +18,15 @@ class LeagueView extends Component {
     this.key = params.key;
   }
 
+  @computed get league() {
+    console.log("Getting league", this.key);
+    return this.evalStore.getLeague(this.key);
+  }
+
   render() {
     return (
         <div>
-          <p>{this.evalStore.getLeague(this.key).name}</p>
+          <p>{this.league.name}</p>
           <ul>
             {
               this.evalStore.getSeasons(this.key).map(season => {

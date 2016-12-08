@@ -1,5 +1,6 @@
 import {observable, computed, action, map} from "mobx";
 import Fb from "./FirebaseStore";
+import Season from "./Season";
 import Rally from "./Rally";
 
 /**
@@ -54,7 +55,7 @@ class EvalStore {
   /**
    * Get a sorted array of seasons
    * @param {string} leagueKey League key
-   * @returns {Array.<SeasonSpec>} Sorted list of seasons for a league
+   * @returns {Array.<Season>} Sorted list of seasons for a league
    */
   getSeasons(leagueKey) {
     if (!this._leagues.has(leagueKey)) {
@@ -65,9 +66,7 @@ class EvalStore {
       if (!this._seasons.has(seasonKey)) {
         return;
       }
-      const season = this._seasons.get(seasonKey);
-      season.key = seasonKey;
-      return season;
+      return this._seasons.get(seasonKey);
     });
     seasons = seasons.filter(season => typeof season !== "undefined");
     return seasons.sort(EvalStore.seasonComparator);
@@ -76,33 +75,13 @@ class EvalStore {
   /**
    * Get a single season
    * @param {string} seasonKey Season key
-   * @returns {SeasonSpec|Object} Season or null
+   * @returns {Season|Object} Season or null
    */
   getSeason(seasonKey) {
     if (!this._seasons.has(seasonKey)) {
       return {};
     }
     return this._seasons.get(seasonKey);
-  }
-
-  /**
-   * Get a sorted array of rallies
-   * @param {string} seasonKey Season key
-   * @returns {Array.<Rally>} Sorted list of rallies for a season
-   */
-  getRallies(seasonKey) {
-    if (!this._seasons.has(seasonKey)) {
-      return [];
-    }
-    const season = this._seasons.get(seasonKey);
-    let rallies = season.rallies.map(rallyKey => {
-      if (!this._rallies.has(rallyKey)) {
-        return;
-      }
-      return this._rallies.get(rallyKey);
-    });
-    rallies = rallies.filter(rally => typeof rally !== "undefined");
-    return rallies.sort(EvalStore.rallyComparator);
   }
 
   /**
@@ -271,7 +250,7 @@ class EvalStore {
     if (this._seasons.has(key)) {
       throw new Error("Why do we already have this season!?");
     }
-    this._seasons.set(key, season);
+    this._seasons.set(key, new Season(key, season, this));
   }
 
   /**
@@ -283,7 +262,7 @@ class EvalStore {
     if (!this._seasons.has(key)) {
       throw new Error("Why do we not have this season yet!?");
     }
-    this._seasons.set(key, season);
+    this._seasons.get(key).updateSeason(season);
   }
 
   /**
@@ -397,16 +376,6 @@ class EvalStore {
   }
 
   /**
-   * Sort rallies by name
-   * @param {RallySpec} rally1 Rally for sorting
-   * @param {RallySpec} rally2 Rally for sorting
-   * @returns {number} Sorting comparator result
-   */
-  static rallyComparator(rally1, rally2) {
-    return rally1.name.localeCompare(rally2.name, "en", {sensitivity: "base"});
-  }
-
-  /**
    * League
    * @typedef {Object} LeagueSpec
    * @property {string} name
@@ -422,6 +391,16 @@ class EvalStore {
    * @property {number} stages
    * @property {Array.<string>|undefined} rallies
    * @property {string|undefined} key
+   * @property {Object.<CarClassSpec>} classes
+   */
+
+  /**
+   * Season car class
+   * @typedef {Object} CarClassSpec
+   * @property {boolean} assists
+   * @property {Array.<string>} cars
+   * @property {string} name
+   * @property {string} key
    */
 
   /**

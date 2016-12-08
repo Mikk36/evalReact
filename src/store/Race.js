@@ -1,4 +1,4 @@
-import {observable, action} from "mobx";
+import {observable, action, computed} from "mobx";
 
 export default class Race {
   @observable key = "race key";
@@ -17,13 +17,14 @@ export default class Race {
    * @param {string} key Race key
    * @param {RaceSpec} race Race data
    * @param {EvalStore} evalStore EvalStore
-   * @param {string} rallyKey Rally key
+   * @param {Rally} rally Rally
    */
-  constructor(key, race, evalStore, rallyKey) {
+  constructor(key, race, evalStore, rally) {
     this.evalStore = evalStore;
     this.key = key;
-    this.rallyKey = rallyKey;
+    this.rally = rally;
     this.updateRace(race);
+    console.log(this);
   }
 
   /**
@@ -37,5 +38,9 @@ export default class Race {
     this.timestamp = race.timestamp;
     this.car = race.car;
     this.assists = race.assists;
+  }
+
+  @computed get vehicleClass() {
+    return this.rally.season.getCarClass(this.car);
   }
 }

@@ -1,5 +1,6 @@
 import {observable, computed, action, map} from "mobx";
 import Fb from "./FirebaseStore";
+import Race from "./Race";
 
 export default class Rally {
   @observable key = "rally key";
@@ -70,7 +71,7 @@ export default class Rally {
 
   /**
    * Get the season of the rally
-   * @return {SeasonSpec} Season of the rally
+   * @return {Season} Season of the rally
    */
   @computed get season() {
     return this.evalStore.getSeason(this.seasonKey);
@@ -122,7 +123,7 @@ export default class Rally {
    * @param {RaceSpec} race Race data
    */
   @action updateRace(key, race) {
-    this.races.set(key, race);
+    this.races.set(key, new Race(key, race, this.evalStore, this));
   }
 
   /**
@@ -158,8 +159,7 @@ export default class Rally {
   @action setLatestRaces(snap) {
     const latestRaces = [];
     snap.forEach(raceSnap => {
-      const race = raceSnap.val();
-      race.key = raceSnap.key;
+      const race = new Race(raceSnap.key, raceSnap.val(), this.evalStore, this);
       latestRaces.push(race);
     });
     latestRaces.reverse();

@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
+import {computed} from "mobx";
 import {Link} from "react-router";
 
 @observer(["evalStore"])
@@ -19,25 +20,33 @@ class SeasonView extends Component {
     this.evalStore.listenRallies(this.key);
   }
 
+  @computed get season() {
+    console.log("Getting season", this.key);
+    return this.evalStore.getSeason(this.key);
+  }
+
   getName() {
-    const season = this.evalStore.getSeason(this.key);
-    const league = this.evalStore.getLeague(season.league);
-    return (<span>{league.name} {season.name}</span>);
+    if (!this.season.name) return;
+    if (!this.season.league) return;
+
+    return (<span>{this.season.league.name} {this.season.name}</span>);
+  }
+
+  renderRallies() {
+    if (!this.season.rallies) return;
+
+    return this.season.rallies.map(rally => {
+      return (
+          <li key={rally.key}><Link to={`/rally/${rally.key}`}>{rally.name}</Link></li>
+      );
+    });
   }
 
   render() {
     return (
         <div>
           <p>{this.getName()}</p>
-          <ul>
-            {
-              this.evalStore.getRallies(this.key).map(rally => {
-                return (
-                    <li key={rally.key}><Link to={`/rally/${rally.key}`}>{rally.name}</Link></li>
-                );
-              })
-            }
-          </ul>
+          <ul>{this.renderRallies()}</ul>
         </div>
     );
   }
