@@ -78,10 +78,10 @@ class RallyView extends Component {
   }
 
   getLatestTimestamp() {
-    if (!this.rally.timestamp) {
+    if (!this.rally.latestTimestamp) {
       return;
     }
-    return new Date(this.rally.timestamp).toLocaleString("et-EE");
+    return new Date(this.rally.latestTimestamp).toLocaleString("et-EE");
   }
 
   getLatestRaces() {
