@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./styles.scss";
-import {observer} from "mobx-react";
+import {observer, inject} from "mobx-react";
 
 import {BrowserRouter, Match, Miss} from "react-router";
 
@@ -57,4 +57,4 @@ function App({layoutStore}) {
   );
 }
 
-export default observer(["layoutStore"], App);
+export default inject(["layoutStore"])(observer(App));

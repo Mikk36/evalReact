@@ -223,12 +223,17 @@ export default class Rally {
   /**
    * Get races for a stage
    * @param {number} stage Stage number
-   * @returns {Array.<RaceSpec>} Array of races ordered by time
+   * @param {string} [classID] Class identifier
+   * @returns {Array.<Race>} Array of races ordered by time
    */
-  getRaces(stage) {
+  getRaces(stage, classID) {
     const races = [];
-    this.races.forEach(/** RaceSpec */ race => {
-      if (race.stage === stage) races.push(race);
+    this.races.forEach(/** Race */ race => {
+      if (race.stage === stage) {
+        if (!classID || (classID && classID === race.vehicleClass.key)) {
+          races.push(race);
+        }
+      }
     });
 
     races.sort((race1, race2) => race1.time - race2.time);

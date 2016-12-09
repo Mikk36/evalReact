@@ -1,5 +1,5 @@
 // import {h, render} from "preact";
-import "./main.css";
+import "styles/main.scss";
 import React from "react";
 import {render} from "react-dom";
 import {useStrict} from "mobx";

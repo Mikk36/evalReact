@@ -1,9 +1,9 @@
 import React, {Component} from "react";
-import {observer} from "mobx-react";
+import {observer, inject} from "mobx-react";
 import {computed} from "mobx";
 import {Link} from "react-router";
 
-@observer(["evalStore"])
+@inject("evalStore") @observer
 class SeasonView extends Component {
   evalStore = null;
 

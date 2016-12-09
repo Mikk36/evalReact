@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import "~react-toolbox/lib/commons";
+@import "layout.scss";
 
 html {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -7,4 +9,10 @@ html {
   background-color: #eee;
   margin: 0;
   padding: 0;
+}
+
+:global {
+  .material-icons {
+    line-height: inherit;
+  }
 }

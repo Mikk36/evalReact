@@ -1,10 +1,14 @@
 import React, {Component} from "react";
-import {observer} from "mobx-react";
+import {observer, inject} from "mobx-react";
 import {computed} from "mobx";
 import {Tab, Tabs, Table} from "react-toolbox";
+import tooltip from "react-toolbox/lib/tooltip";
 import Moment from "moment";
+import styles from "./styles.scss";
 
-@observer(["evalStore"])
+const TooltippedDiv = tooltip(props => <div {...props} />);
+
+@inject("evalStore") @observer
 class RallyView extends Component {
   evalStore = null;
 
@@ -36,12 +40,12 @@ class RallyView extends Component {
   }
 
   static formatRaceTime(time) {
-    const t = Moment.utc(time * 1000);
+    const t = Moment.utc(Math.round(time * 1000));
     return t.format("mm:ss.SSS");
   }
 
   static formatDifference(time) {
-    const t = Moment.utc(time * 1000);
+    const t = Moment.utc(Math.round(time * 10) * 100);
     return t.format("+mm:ss.S");
   }
 
@@ -82,41 +86,48 @@ class RallyView extends Component {
     };
   }
 
-  RaceModel = {
-    place: {type: Number, title: "Koht"},
-    name: {type: String, title: "Nimi"},
-    time: {type: String, title: "Aeg"},
-    diffToFirst: {type: String, title: "Vahe esimesega"},
-    diffToPrevious: {type: String, title: "Vahe eelmisega"}
-  };
-
   getTabs() {
-    if (!this.rally.key) return [];
+    if (!this.rally.key || !this.rally.season.classes) return [];
+
+    const raceModel = {
+      place: {type: Number, title: "Koht"},
+      name: {type: String, title: "Nimi"},
+      time: {type: String, title: "Aeg"},
+      diffToFirst: {type: String, title: "Vahe esimesega"},
+      diffToPrevious: {type: String, title: "Vahe eelmisega"}
+    };
 
     const tabs = [];
     const stages = this.rally.season.stages;
     for (let stageNum = 1; stageNum <= stages; stageNum++) {
-      const races = this.rally.getRaces(stageNum);
-      const data = races.map((race, index) => {
-        // if (index !== 0 && race.stage === 6 && race.driver !== null && race.driver.name === "Ken Kivi") {
-        //   console.log("times: ", race.time, races[index - 1].time);
-        //   console.log("difference: ", race.time - races[index - 1].time);
-        //   console.log(RallyView.formatDifference(race.time - races[index - 1].time));
-        // }
-        return {
-          place: index + 1,
-          name: this.evalStore.getDriver(race.userName).name || race.userName,
-          time: RallyView.formatRaceTime(race.time),
-          diffToFirst: index !== 0 ? RallyView.formatDifference(race.time - races[0].time) : "",
-          diffToPrevious: index !== 0 ? RallyView.formatDifference(race.time - races[index - 1].time) : ""
-        };
-      });
-      tabs.push(<Tab key={stageNum} label={"SS" + stageNum}>
-        <Table
-            model={this.RaceModel}
+      const classes = [];
+      this.rally.season.classes.forEach((raceClass, key) => {
+        const races = this.rally.getRaces(stageNum, key);
+        const data = races.map((race, index) => {
+          return {
+            place: index + 1,
+            name: race.driver
+                ? <TooltippedDiv tooltip={race.userName} tooltipDelay={500}
+                                 tooltipShowOnClick={true}>{race.driver.name}</TooltippedDiv>
+                : race.userName,
+            time: RallyView.formatRaceTime(race.time),
+            diffToFirst: index !== 0 ? RallyView.formatDifference(race.time - races[0].time) : "",
+            diffToPrevious: index !== 0 ? RallyView.formatDifference(race.time - races[index - 1].time) : ""
+          };
+        });
+        classes.push(<Table
+            key={key}
+            model={raceModel}
             source={data}
             selectable={false}
-        />
+        />);
+      });
+      tabs.push(<Tab key={stageNum} label={"SS" + stageNum}>
+        <div className={styles.raceTables}>
+          {
+            classes
+          }
+        </div>
       </Tab>);
     }
     return tabs;

@@ -1,7 +1,8 @@
-@import "~react-toolbox/lib/commons";
+@import "~react-toolbox/lib/colors";
+@import "~react-toolbox/lib/globals";
+@import "~react-toolbox/lib/mixins";
 @import "./colors";
 @import "./type";
-@import "./layout";
 
 //$color-primary: $palette-blue-500;
 //$color-primary-dark: $palette-blue-700;
@@ -11,8 +12,15 @@ $list-item-min-height: 3 * $unit;
 
 $footer-height: 8 * $unit;
 
-:global {
-  .material-icons {
-    line-height: inherit;
-  }
+$appbar-height: 64px;
+$sidedrawer-width: 11rem;
+$footer-height: 160px;
+$padding-left: 1.2rem;
+
+.fixed {
+  position: fixed;
+}
+
+.noUserSelect {
+  user-select: none;
 }

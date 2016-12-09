@@ -1,0 +1,14 @@
+.raceTables {
+  display: flex;
+  table {
+    flex: 1;
+    width: auto;
+    tr {
+      height: 20px;
+      line-height: 20px;
+    }
+    th, td {
+      padding: 0 0.6rem;
+    }
+  }
+}

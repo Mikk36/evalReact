@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {computed} from "mobx";
-import {observer} from "mobx-react";
+import {observer, inject} from "mobx-react";
 import {Link} from "react-router";
 
-@observer(["evalStore"])
+@inject("evalStore") @observer
 class LeagueView extends Component {
   evalStore = null;
 

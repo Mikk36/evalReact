@@ -14,7 +14,7 @@ const getPlugins = () => {
       new webpack.LoaderOptionsPlugin({
         options: {
           sassLoader: {
-            data: "@import \"styles/theme\";",
+            // data: "@import \"styles/theme\";",
             includePaths: [path.resolve(__dirname, "./src/")]
           },
           postcss: [autoprefixer({browsers: ["last 2 versions"]})],
@@ -31,7 +31,10 @@ const getPlugins = () => {
         template: "./src/index.html"
       }),
       new webpack.NoErrorsPlugin(),
-      new ExtractTextPlugin({filename: "[name].[hash].css", allChunks: true}),
+      new ExtractTextPlugin({
+        filename: "[name].[hash].css",
+        allChunks: true
+      }),
       new webpack.optimize.CommonsChunkPlugin({
         names: ["main", "vendor"],
         filename: "[name].[hash].js",
@@ -56,8 +59,7 @@ const getPlugins = () => {
           output: {comments: false},
           sourceMap: true
         }),
-        new webpack.optimize.OccurrenceOrderPlugin(true),
-        new webpack.optimize.DedupePlugin()
+        new webpack.optimize.OccurrenceOrderPlugin(true)
     );
   }
 
@@ -124,23 +126,24 @@ module.exports = {
         }
       },
       {
-        test: /\.json$/, loader: "json"
+        test: /\.json$/, loader: "json-loader"
       },
       {
         test: /(\.scss|\.css)$/,
         loader: ExtractTextPlugin.extract({
           fallbackLoader: "style-loader",
           loader: [
-            "css-loader?sourceMap&importLoaders=2&modules&localIdentName=[name]__[local]___[hash:base64:5]",
+            "css-loader?sourceMap&importLoaders=1&modules&localIdentName=[name]__[local]___[hash:base64:5]",
             "postcss-loader",
-            "sass-loader?outputStyle=expanded&sourceMap&sourceMapContents"
+            // "sass-loader?outputStyle=expanded&sourceMap&sourceMapContents"
+            "sass-loader"
           ].join("!")
         })
       },
-      {test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff"},
-      {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream"},
-      {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file"},
-      {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml"}
+      {test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff"},
+      {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/octet-stream"},
+      {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader"},
+      {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=image/svg+xml"}
     ]
   },
   plugins: getPlugins()
