@@ -84,7 +84,7 @@ const getEntry = () => {
 module.exports = {
   stats: {children: false}, // hides the annoying "hidden-modules" spam when building
   cache: isDev,
-  devtool: isDev ? "eval-source-map" : "source-map",
+  devtool: "source-map",
   context: path.join(__dirname, "/"),
   entry: getEntry(),
   output: {
