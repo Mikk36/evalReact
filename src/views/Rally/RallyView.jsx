@@ -28,9 +28,6 @@ class RallyView extends Component {
 
     this.evalStore.listenRally(this.key);
     this.evalStore.listenRaces(this.key);
-
-    // 0.9830000000000041
-    console.log(RallyView.formatDifference(0.95000000001));
   }
 
   @computed get rally() {
