@@ -9,6 +9,7 @@ export default class Race {
   @observable timestamp = "timestamp";
   @observable car = "car name";
   @observable assists = false;
+  @observable driver = null;
 
   evalStore = null;
 
@@ -37,6 +38,9 @@ export default class Race {
     this.timestamp = race.timestamp;
     this.car = race.car;
     this.assists = race.assists;
+
+    const driver = this.evalStore.getDriver(race.userName);
+    if (driver.name) this.driver = driver;
   }
 
   @computed get vehicleClass() {

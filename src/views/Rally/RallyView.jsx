@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {observer} from "mobx-react";
 import {computed} from "mobx";
 import {Tab, Tabs, Table} from "react-toolbox";
+import Moment from "moment";
 
 @observer(["evalStore"])
 class RallyView extends Component {
@@ -27,6 +28,9 @@ class RallyView extends Component {
 
     this.evalStore.listenRally(this.key);
     this.evalStore.listenRaces(this.key);
+
+    // 0.9830000000000041
+    console.log(RallyView.formatDifference(0.95000000001));
   }
 
   @computed get rally() {
@@ -35,39 +39,13 @@ class RallyView extends Component {
   }
 
   static formatRaceTime(time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = time - (minutes * 60);
-
-    let minuteString = Math.floor(minutes).toString();
-    let secondString = Math.floor(seconds).toString();
-    let microSecondString = seconds.toFixed(3);
-    microSecondString = microSecondString.substr(microSecondString.indexOf(".") + 1);
-
-    if (minutes < 10) {
-      minuteString = "0" + minuteString;
-    }
-    if (seconds < 10) {
-      secondString = "0" + secondString;
-    }
-    return `${minuteString}:${secondString}.${microSecondString}`;
+    const t = Moment.utc(time * 1000);
+    return t.format("mm:ss.SSS");
   }
 
   static formatDifference(time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = time - (minutes * 60);
-
-    let minuteString = Math.floor(minutes).toString();
-    let secondString = Math.floor(seconds).toString();
-    let microSecondString = seconds.toFixed(1);
-    microSecondString = microSecondString.substr(microSecondString.indexOf(".") + 1);
-
-    if (minutes < 10) {
-      minuteString = "0" + minuteString;
-    }
-    if (seconds < 10) {
-      secondString = "0" + secondString;
-    }
-    return `+${minuteString}:${secondString}.${microSecondString}`;
+    const t = Moment.utc(time * 1000);
+    return t.format("+mm:ss.S");
   }
 
   getName() {
@@ -123,6 +101,11 @@ class RallyView extends Component {
     for (let stageNum = 1; stageNum <= stages; stageNum++) {
       const races = this.rally.getRaces(stageNum);
       const data = races.map((race, index) => {
+        // if (index !== 0 && race.stage === 6 && race.driver !== null && race.driver.name === "Ken Kivi") {
+        //   console.log("times: ", race.time, races[index - 1].time);
+        //   console.log("difference: ", race.time - races[index - 1].time);
+        //   console.log(RallyView.formatDifference(race.time - races[index - 1].time));
+        // }
         return {
           place: index + 1,
           name: this.evalStore.getDriver(race.userName).name || race.userName,
