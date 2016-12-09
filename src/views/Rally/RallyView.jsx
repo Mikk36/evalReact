@@ -6,7 +6,11 @@ import tooltip from "react-toolbox/lib/tooltip";
 import Moment from "moment";
 import styles from "./styles.scss";
 
-const TooltippedDiv = tooltip(props => <div {...props} />);
+const TooltippedDiv = tooltip(props => {
+  const divProps = Object.assign({}, props);
+  delete divProps.theme;
+  return <div {...divProps} />;
+});
 
 @inject("evalStore") @observer
 class RallyView extends Component {
