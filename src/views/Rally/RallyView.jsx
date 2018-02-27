@@ -27,7 +27,7 @@ class RallyView extends Component {
    * @param {EvalStore} evalStore EvalStore
    * @param {Object} params Params
    */
-  constructor({evalStore, params}) {
+  constructor({evalStore, match: {params}}) {
     super();
     this.evalStore = evalStore;
     this.key = params.key;
@@ -73,13 +73,13 @@ class RallyView extends Component {
     }
     return this.rally.latestRaces.map(race => {
       return (
-          <li key={race.key}>
-            {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
-            Class: {race.vehicleClass.name}&nbsp;
-            Driver: {this.evalStore.getDriver(race.userName).name || race.userName}&nbsp;
-            Stage: {race.stage}&nbsp;
-            Time: {RallyView.formatRaceTime(race.time)}
-          </li>
+        <li key={race.key}>
+          {new Date(race.timestamp).toLocaleString("et-EE")}&nbsp;
+          Class: {race.vehicleClass.name}&nbsp;
+          Driver: {this.evalStore.getDriver(race.userName).name || race.userName}&nbsp;
+          Stage: {race.stage}&nbsp;
+          Time: {RallyView.formatRaceTime(race.time)}
+        </li>
       );
     });
   }
@@ -111,19 +111,19 @@ class RallyView extends Component {
           return {
             place: index + 1,
             name: race.driver
-                ? <TooltippedDiv tooltip={race.userName} tooltipDelay={500}
-                                 tooltipShowOnClick={true}>{race.driver.name}</TooltippedDiv>
-                : race.userName,
+              ? <TooltippedDiv tooltip={race.userName} tooltipDelay={500}
+                               tooltipShowOnClick={true}>{race.driver.name}</TooltippedDiv>
+              : race.userName,
             time: RallyView.formatRaceTime(race.time),
             diffToFirst: index !== 0 ? RallyView.formatDifference(race.time - races[0].time) : "",
             diffToPrevious: index !== 0 ? RallyView.formatDifference(race.time - races[index - 1].time) : ""
           };
         });
         classes.push(<Table
-            key={key}
-            model={raceModel}
-            source={data}
-            selectable={false}
+          key={key}
+          model={raceModel}
+          source={data}
+          selectable={false}
         />);
       });
       tabs.push(<Tab key={stageNum} label={"SS" + stageNum}>
@@ -139,22 +139,22 @@ class RallyView extends Component {
 
   render() {
     return (
-        <div>
-          <p>{this.getName()}</p>
-          <p>Latest data time: {this.getLatestTimestamp()}</p>
-          <Tabs index={this.state.tabIndex} onChange={this.setActiveTab}>
-            <Tab label="Värskeimad sõidud">
-              <ul>
-                {this.getLatestRaces()}
-              </ul>
-            </Tab>
-            <Tab label="Üld">Blah</Tab>
-            <Tab label="Üld tiimid">Tiimid</Tab>
-            {
-              this.getTabs()
-            }
-          </Tabs>
-        </div>
+      <div>
+        <p>{this.getName()}</p>
+        <p>Latest data time: {this.getLatestTimestamp()}</p>
+        <Tabs index={this.state.tabIndex} onChange={this.setActiveTab}>
+          <Tab label="Värskeimad sõidud">
+            <ul>
+              {this.getLatestRaces()}
+            </ul>
+          </Tab>
+          <Tab label="Üld">Blah</Tab>
+          <Tab label="Üld tiimid">Tiimid</Tab>
+          {
+            this.getTabs()
+          }
+        </Tabs>
+      </div>
     );
   }
 }

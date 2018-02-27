@@ -7,14 +7,14 @@ import {AppBar as RTAppBar} from "react-toolbox/lib/app_bar";
 
 function AppBar({title, toggleSidebar}) {
   return (
-      <RTAppBar
-          theme={styles}
-          flat
-          leftIcon={<i className="material-icons">menu</i>}
-          onLeftIconClick={toggleSidebar}
-      >
-        {title}
-      </RTAppBar>
+    <RTAppBar
+      theme={styles}
+      flat
+      leftIcon={<i className="material-icons">menu</i>}
+      onLeftIconClick={toggleSidebar}
+    >
+      {title}
+    </RTAppBar>
   );
 }
 

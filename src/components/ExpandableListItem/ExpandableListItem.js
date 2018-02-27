@@ -15,17 +15,17 @@ export default class ExpandableListItem extends Component {
   render() {
     const {title, children} = this.props;
     return (
-        <div>
-          <ListItem
-              theme={styles}
-              selectable
-              caption={title}
-              onClick={this.toggleOpen}
-          />
-          {this.isOpen
-              ? children
-              : null }
-        </div>
+      <div>
+        <ListItem
+          theme={styles}
+          selectable
+          caption={title}
+          onClick={this.toggleOpen}
+        />
+        {this.isOpen
+          ? children
+          : null}
+      </div>
     );
   }
 }

@@ -1,8 +1,9 @@
 import React from "react";
 import styles from "./styles.scss";
-import Link from "react-router/Link";
+import {Link, NavLink} from "react-router-dom";
 import {List} from "react-toolbox/lib/list";
-import NavLink from "components/NavLink/NavLink";
+
+// import NavLink from "components/NavLink/NavLink";
 
 /**
  * Returns a SideDrawer component
@@ -12,16 +13,16 @@ import NavLink from "components/NavLink/NavLink";
  */
 function SideDrawer({title}) {
   return (
-      <div className={styles.drawer}>
-        <Link to="/">{({onClick}) => <div className={styles.drawerBrand} onClick={onClick}>{title}</div>}</Link>
-        <hr className={styles.divider}/>
-        <div>
-          <List ripple>
-            <NavLink to="/">Leagues</NavLink>
-            <NavLink to="/about">About</NavLink>
-          </List>
-        </div>
+    <div className={styles.drawer}>
+      <Link to="/">{({onClick}) => <div className={styles.drawerBrand} onClick={onClick}>{title}</div>}</Link>
+      <hr className={styles.divider}/>
+      <div>
+        <List ripple>
+          <NavLink exact={true} to="/">Leagues</NavLink>
+          <NavLink exact={true} to="/about">About</NavLink>
+        </List>
       </div>
+    </div>
   );
 }
 

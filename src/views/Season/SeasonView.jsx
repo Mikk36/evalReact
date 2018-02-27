@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {observer, inject} from "mobx-react";
 import {computed} from "mobx";
-import {Link} from "react-router";
+import {Link} from "react-router-dom";
 
 @inject("evalStore") @observer
 class SeasonView extends Component {
@@ -12,7 +12,7 @@ class SeasonView extends Component {
    * @param {EvalStore} evalStore EvalStore
    * @param {Object} params Params
    */
-  constructor({evalStore, params}) {
+  constructor({evalStore, match: {params}}) {
     super();
     this.evalStore = evalStore;
     this.key = params.key;
@@ -37,17 +37,17 @@ class SeasonView extends Component {
 
     return this.season.rallies.map(rally => {
       return (
-          <li key={rally.key}><Link to={`/rally/${rally.key}`}>{rally.name}</Link></li>
+        <li key={rally.key}><Link to={`/rally/${rally.key}`}>{rally.name}</Link></li>
       );
     });
   }
 
   render() {
     return (
-        <div>
-          <p>{this.getName()}</p>
-          <ul>{this.renderRallies()}</ul>
-        </div>
+      <div>
+        <p>{this.getName()}</p>
+        <ul>{this.renderRallies()}</ul>
+      </div>
     );
   }
 }

@@ -1,8 +1,8 @@
-// import {h, render} from "preact";
 import "styles/main.scss";
 import React from "react";
 import {render} from "react-dom";
 import {useStrict} from "mobx";
+
 useStrict(true);
 import {Provider} from "mobx-react";
 import viewStore from "./store/ViewStore";
@@ -28,11 +28,11 @@ let DevTools = () => null;
 if (__DEV__) DevTools = require("mobx-react-devtools").default;
 
 render(
-    <Provider {...stores}>
-      <div>
-        <App />
-        <DevTools />
-      </div>
-    </Provider>,
-    document.getElementById("app")
+  <Provider {...stores}>
+    <div>
+      <App/>
+      <DevTools/>
+    </div>
+  </Provider>,
+  document.getElementById("app")
 );

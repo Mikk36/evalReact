@@ -228,7 +228,7 @@ export default class Rally {
    */
   getRaces(stage, classID) {
     const races = [];
-    this.races.forEach(/** Race */ race => {
+    this.races.forEach(/** Race */race => {
       if (race.stage === stage) {
         if (!classID || (classID && classID === race.vehicleClass.key)) {
           races.push(race);

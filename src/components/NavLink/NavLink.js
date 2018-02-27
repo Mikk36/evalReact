@@ -1,7 +1,6 @@
-// import {h} from "preact";
 import React from "react";
 import styles from "./styles.scss";
-import Link from "react-router/Link";
+import {Link} from "react-router-dom";
 import {ListItem} from "react-toolbox/lib/list";
 
 /**
@@ -13,16 +12,16 @@ import {ListItem} from "react-toolbox/lib/list";
  */
 function NavLink({to, children}) {
   return (
-      <Link activeOnlyWhenExact to={to}>{ ({onClick, isActive}) =>
-          <ListItem
-              theme={styles}
-              className={isActive ? styles.active : null}
-              selectable
-              caption={children}
-              onClick={onClick}
-          />
-      }
-      </Link>
+    <Link activeOnlyWhenExact to={to}>{({onClick, isActive}) =>
+      <ListItem
+        theme={styles}
+        className={isActive ? styles.active : null}
+        selectable
+        caption={children}
+        onClick={onClick}
+      />
+    }
+    </Link>
   );
 }
 
