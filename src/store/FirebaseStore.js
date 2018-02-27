@@ -1,10 +1,12 @@
 import firebase from "firebase";
 
 const config = {
-  apiKey: "AIzaSyAbEkj637b2sGc6m48V1kqyPFNnfE40QjU",
-  authDomain: "eval-dirt.firebaseapp.com",
-  databaseURL: "https://eval-dirt.firebaseio.com",
-  storageBucket: "eval-dirt.appspot.com"
+  apiKey: "AIzaSyCWU_Ec9lgkPEo--jjhJdccRvJiJ4o76T0",
+  authDomain: "eval-dirt-rally.firebaseapp.com",
+  databaseURL: "https://eval-dirt-rally.firebaseio.com",
+  projectId: "eval-dirt-rally",
+  storageBucket: "eval-dirt-rally.appspot.com",
+  messagingSenderId: "960899693694"
 };
 const fbApp = firebase.initializeApp(config);
 
